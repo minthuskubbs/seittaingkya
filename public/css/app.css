@@ -1,0 +1,87 @@
+:root {
+  --brand: #b30b0b;
+  --brand-2: #b30b0b;
+  --brand-dark: #8f0909;
+  --brand-soft: #f7e6e6;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --sidebar-w: 250px;
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+body {
+  background: #ffffff;
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- Auth ---------- */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+  padding: 1rem;
+}
+.auth-card { width: 100%; max-width: 420px; border: 0; border-radius: 16px; box-shadow: 0 20px 45px rgba(0,0,0,.25); }
+.auth-logo { width: 62px; height: 62px; border-radius: 16px; display: grid; place-items: center;
+  background: var(--brand); color: #fff; font-size: 30px; }
+
+/* ---------- Shell ---------- */
+.app-sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w);
+  background: var(--brand); color: #ffffff; overflow-y: auto; z-index: 1040;
+  transition: transform .25s ease;
+}
+.app-sidebar .brand { display: flex; align-items: center; justify-content: center; padding: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,.15); }
+.app-sidebar .brand-logo { max-width: 100%; height: 72px; object-fit: contain;
+  background: #fff; border-radius: 12px; padding: 8px 16px; }
+.app-sidebar .nav-section { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
+  color: rgba(255,255,255,.6); padding: .9rem 1.2rem .3rem; }
+.app-sidebar .nav-link { color: rgba(255,255,255,.9); padding: .55rem 1.2rem; display: flex; align-items: center; gap: .65rem;
+  border-left: 3px solid transparent; font-size: .92rem; }
+.app-sidebar .nav-link:hover { background: rgba(0,0,0,.15); color: #fff; }
+.app-sidebar .nav-link.active { background: rgba(0,0,0,.22); color: #fff; border-left-color: #fff; }
+.app-sidebar .nav-link i { width: 18px; text-align: center; }
+
+.app-main { margin-left: var(--sidebar-w); min-height: 100vh; background: #ffffff; }
+.app-topbar { background: #fff; border-bottom: 1px solid #e6e6e6; padding: .6rem 1.1rem;
+  display: flex; align-items: center; gap: .8rem; position: sticky; top: 0; z-index: 1030; }
+.app-content { padding: 1.2rem; }
+
+.sidebar-backdrop { display: none; }
+
+@media (max-width: 991.98px) {
+  .app-sidebar { transform: translateX(-100%); }
+  .app-sidebar.open { transform: translateX(0); }
+  .app-main { margin-left: 0; }
+  .sidebar-backdrop.show { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1035; }
+}
+
+/* ---------- Bits ---------- */
+.btn-brand { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn-brand:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; }
+.text-brand { color: var(--brand) !important; }
+.bg-brand { background: var(--brand) !important; color: #fff; }
+.bg-brand-2 { background: var(--brand) !important; color: #fff; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { color: var(--brand-dark); }
+
+.stat-card { border: 0; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.07); }
+/* Coloured icon badge — works whether or not it sits inside a .stat-card, and
+   never shrinks inside a flex row (which was clipping the glyph). */
+.icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; color: #fff; font-size: 20px; flex: 0 0 auto; line-height: 1; }
+.card { border: 1px solid #ededed; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
+.card-header { background: #fff; border-bottom: 1px solid #eee; font-weight: 600; color: var(--ink); }
+.table > :not(caption) > * > * { padding: .6rem .7rem; }
+.badge-soft-brand { background: var(--brand-soft); color: var(--brand-dark); }
+.form-label { font-weight: 500; font-size: .9rem; }
+.offline-banner { display: none; background: #ffca2c; color: #4a3b00; text-align: center; padding: .35rem; font-size: .85rem; font-weight: 600; }
+body.is-offline .offline-banner { display: block; }
+.notif-dot { position: absolute; top: 2px; right: 2px; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); }
+@media print {
+  .app-sidebar, .app-topbar, .no-print { display: none !important; }
+  .app-main { margin-left: 0; }
+  .app-content { padding: 0; }
+}

@@ -1,0 +1,18 @@
+# cPanel / shared-hosting root .htaccess
+# The whole Laravel app lives in public_html/, but Laravel must be served from
+# its public/ folder. This forwards every request into public/ and blocks direct
+# access to app files. (Locally with `php artisan serve` this file is ignored.)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Send everything into the public/ folder (unless it's already there).
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+# Block direct browsing to sensitive files/folders if the rewrite is bypassed.
+<FilesMatch "^\.env|composer\.(json|lock)|artisan|package\.json$">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes

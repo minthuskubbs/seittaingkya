@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Concerns\BelongsToClinic;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
+class Treatment extends Model
+{
+    use BelongsToClinic;
+
+    protected $fillable = [
+        'clinic_id', 'patient_id', 'appointment_id', 'doctor_id', 'procedure_id',
+        'tooth', 'diagnosis', 'notes', 'treatment_date', 'doctor_feedback',
+        // Billing
+        'denture_charge', 'surgery_charge', 'additional_charge',
+        'extraction_price', 'extraction_qty', 'implant_price', 'implant_qty',
+        'total_amount',
+    ];
+
+    protected $casts = [
+        'treatment_date' => 'date',
+        'denture_charge' => 'decimal:2',
+        'surgery_charge' => 'decimal:2',
+        'additional_charge' => 'decimal:2',
+        'extraction_price' => 'decimal:2',
+        'implant_price' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+    ];
+
+    public function patient(): BelongsTo
+    {
+        return $this->belongsTo(Patient::class);
+    }
+
+    public function doctor(): BelongsTo
+    {
+        return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
+
+    public function procedure(): BelongsTo
+    {
+        return $this->belongsTo(Procedure::class);
+    }
+
+    public function treatmentTypes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(TreatmentType::class);
+    }
+
+    public function appointment(): BelongsTo
+    {
+        return $this->belongsTo(Appointment::class);
+    }
+
+    public function fees(): HasMany
+    {
+        return $this->hasMany(TreatmentFee::class);
+    }
+
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
+    }
+
+    /** Medicine sales linked to this treatment (combined into its invoice). */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    public function extractionTotal(): float
+    {
+        return (float) $this->extraction_price * (int) $this->extraction_qty;
+    }
+
+    public function implantTotal(): float
+    {
+        return (float) $this->implant_price * (int) $this->implant_qty;
+    }
+
+    /** Fees + per-tooth + surgery + additional + denture (excludes linked medicine sales). */
+    public function chargesTotal(): float
+    {
+        return (float) $this->fees()->sum('line_total')
+            + $this->extractionTotal() + $this->implantTotal()
+            + (float) $this->surgery_charge + (float) $this->additional_charge + (float) $this->denture_charge;
+    }
+
+    /** Grand total including any linked medicine sales. */
+    public function invoiceTotal(): float
+    {
+        return $this->chargesTotal() + (float) $this->sales()->sum('total');
+    }
+
+    public function paidAmount(): float
+    {
+        return (float) $this->payments()->sum('amount');
+    }
+
+    public function balance(): float
+    {
+        return $this->invoiceTotal() - $this->paidAmount();
+    }
+
+    public function recalculateTotal(): void
+    {
+        $this->total_amount = $this->chargesTotal();
+        $this->saveQuietly();
+    }
+}
