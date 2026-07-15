@@ -51,15 +51,13 @@
                         </select></div>
                 @endunless
                 <div class="mb-2"><label class="form-label">Treatment (optional)</label>
-                    <input list="treatmentList" name="treatment_id_label" class="form-control" placeholder="Search TX / patient code…"
-                           x-model="txLabel" @input="matchTx()" autocomplete="off">
-                    <datalist id="treatmentList">
+                    <select name="treatment_id" class="form-select">
+                        <option value="">— Standalone receipt —</option>
                         @foreach($treatments as $tx)
-                            <option data-id="{{ $tx->id }}" value="TX-{{ $tx->id }} · {{ $tx->patient?->patient_code }} {{ $tx->patient?->name }} · {{ $tx->treatment_date?->format('Y-m-d') }}"></option>
+                            <option value="{{ $tx->id }}">TX-{{ $tx->id }} · {{ $tx->patient?->patient_code }} {{ $tx->patient?->name }} · {{ $tx->treatment_date?->format('Y-m-d') }}</option>
                         @endforeach
-                    </datalist>
-                    <input type="hidden" name="treatment_id" x-model="treatmentId">
-                    <div class="form-text">Link this sale to a treatment to combine it into that invoice. Leave empty for a standalone receipt.</div>
+                    </select>
+                    <div class="form-text">Selecting a treatment adds this sale's total to that treatment's invoice. Leave empty for a standalone receipt.</div>
                 </div>
                 <div class="mb-2"><label class="form-label">Sale Type</label>
                     <select name="sale_type" class="form-select" x-model="saleType">
@@ -93,13 +91,7 @@
 function pos() {
   return {
     items: [], pick: '', discount: 0, saleType: 'walk_in', subtotal: 0, total: 0,
-    txLabel: '', treatmentId: '',
     fmt(n){ return new Intl.NumberFormat().format(n||0)+' MMK'; },
-    matchTx() {
-      // Resolve the datalist selection back to a treatment id.
-      const opt = [...document.querySelectorAll('#treatmentList option')].find(o => o.value === this.txLabel);
-      this.treatmentId = opt ? opt.dataset.id : '';
-    },
     add() {
       if (!this.pick) return;
       const opt = document.querySelector('option[value="'+this.pick+'"]');
