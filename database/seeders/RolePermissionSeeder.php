@@ -47,28 +47,20 @@ class RolePermissionSeeder extends Seeder
         $superAdmin = Role::findOrCreate('super_admin');
         $superAdmin->syncPermissions(Permission::all());
 
-        // Clinic admin: day-to-day operations only. No finance, reports, product
-        // CRUD, suppliers, doctors, staff. Inventory is limited to stock-out.
-        $clinicAdmin = Role::findOrCreate('clinic_admin');
-        $clinicAdmin->syncPermissions([
+        // Clinic admin & Assistance admin share the SAME day-to-day permissions:
+        // patients, appointments, treatments/billing, doctor notes, stock-out and
+        // medicine sales. No finance, reports, product CRUD, suppliers, doctors or
+        // staff — those stay super-admin only.
+        $sharedStaffPermissions = [
             'patients.view', 'patients.manage',
             'appointments.view', 'appointments.manage',
-            // Treatment is the billing record they add charges to.
             'clinical.view', 'clinical.manage',
             'doctor_notes.manage',
             'inventory.view', 'inventory.stockout',
             'pos.use', 'billing.view', 'billing.manage',
-        ]);
+        ];
 
-        // Assistance admin: stock-out + medicine sales, appointments, and can view
-        // treatments + add doctor feedback (but not edit charges).
-        $assistanceAdmin = Role::findOrCreate('assistance_admin');
-        $assistanceAdmin->syncPermissions([
-            'patients.view',
-            'appointments.view', 'appointments.manage',
-            'clinical.view', 'doctor_notes.manage',
-            'inventory.view', 'inventory.stockout',
-            'pos.use', 'billing.view',
-        ]);
+        Role::findOrCreate('clinic_admin')->syncPermissions($sharedStaffPermissions);
+        Role::findOrCreate('assistance_admin')->syncPermissions($sharedStaffPermissions);
     }
 }
