@@ -41,7 +41,7 @@ class PaymentController extends Controller
     /** Printable invoice/voucher — combines treatment charges and any linked medicine sales. */
     public function invoice(Treatment $treatment)
     {
-        $treatment->load(['patient', 'doctor', 'fees', 'payments', 'sales.items', 'clinic']);
+        $treatment->load(['patient', 'doctor', 'fees', 'payments', 'sales.items', 'clinic', 'treatmentTypes']);
 
         AuditLog::record('print', "Printed invoice for treatment #{$treatment->id}"
             .($treatment->patient ? " ({$treatment->patient->patient_code})" : ''), $treatment);

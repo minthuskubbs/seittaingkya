@@ -54,10 +54,14 @@ class TreatmentTypeController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'price' => 'nullable|numeric|min:0',
+            'require_qty' => 'nullable|boolean',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
         ]);
         $data['is_active'] = $request->boolean('is_active', true);
+        $data['require_qty'] = $request->boolean('require_qty', true);
+        $data['price'] = $data['price'] ?? 0;
         $data['sort_order'] = $data['sort_order'] ?? 0;
 
         return $data;

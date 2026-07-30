@@ -25,15 +25,23 @@
     <div class="col-md-6"><label class="form-label">Diagnosis</label>
         <input name="diagnosis" class="form-control" value="{{ old('diagnosis',$treatment->diagnosis??'') }}"></div>
 
-    @php $selectedTypes = old('treatment_types', isset($treatment) ? $treatment->treatmentTypes->pluck('id')->all() : []); @endphp
+    @php
+        $selectedTypes = old('treatment_types', isset($treatment) ? $treatment->treatmentTypes->pluck('id')->all() : []);
+        $typeQty = old('treatment_type_qty', isset($treatment) ? $treatment->treatmentTypes->pluck('pivot.qty', 'id')->all() : []);
+    @endphp
     <div class="col-12">
         <label class="form-label">Treatment Type(s)</label>
         <div class="row g-2">
             @forelse($treatmentTypes as $tt)
-                <div class="col-md-3 col-6">
+                <div class="col-md-4 col-6">
                     <label class="border rounded p-2 d-flex align-items-center gap-2 h-100">
-                        <input type="checkbox" class="form-check-input mt-0" name="treatment_types[]" value="{{ $tt->id }}" @checked(in_array($tt->id, $selectedTypes))>
-                        <span class="small">{{ $tt->name }}</span>
+                        <input type="checkbox" class="form-check-input mt-0 tt-check" name="treatment_types[]" value="{{ $tt->id }}"
+                               data-price="{{ $tt->price }}" data-qty="{{ $tt->require_qty ? 1 : 0 }}" @checked(in_array($tt->id, $selectedTypes)) @change="recalc()">
+                        <span class="small flex-grow-1">{{ $tt->name }}<br><span class="text-muted">{{ money($tt->price) }}</span></span>
+                        @if($tt->require_qty)
+                            <input type="number" min="1" name="treatment_type_qty[{{ $tt->id }}]" class="form-control form-control-sm" style="width:64px"
+                                   value="{{ $typeQty[$tt->id] ?? 1 }}" @input="recalc()" title="Qty">
+                        @endif
                     </label>
                 </div>
             @empty
@@ -135,7 +143,18 @@ function txBilling() {
     recalc() {
       let fees = 0;
       document.querySelectorAll('input[name="fees[]"]:checked').forEach(el => fees += parseFloat(el.dataset.price||0));
-      this.total = fees + (this.exPrice*this.exQty) + (this.imPrice*this.imQty)
+      // Treatment types: price × qty (flat when the type has no qty).
+      let types = 0;
+      document.querySelectorAll('input.tt-check:checked').forEach(el => {
+        const price = parseFloat(el.dataset.price||0);
+        let qty = 1;
+        if (el.dataset.qty === '1') {
+          const q = el.closest('label').querySelector('input[type="number"]');
+          qty = q ? Math.max(1, parseInt(q.value)||1) : 1;
+        }
+        types += price * qty;
+      });
+      this.total = fees + types + (this.exPrice*this.exQty) + (this.imPrice*this.imQty)
         + (this.surgery||0) + (this.denture||0) + (this.additional||0);
       const v = this.discountValue || 0;
       this.discountAmount = this.discountType === 'percent' ? this.total * Math.min(v,100) / 100 : Math.min(v, this.total);

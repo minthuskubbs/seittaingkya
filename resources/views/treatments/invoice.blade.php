@@ -29,6 +29,9 @@
     <table class="table">
         <thead><tr><th>Description</th><th class="text-end">Amount</th></tr></thead>
         <tbody>
+        @foreach($treatment->treatmentTypes as $tt)
+            <tr><td>{{ $tt->name }}@if($tt->pivot->qty > 1) ({{ $tt->pivot->qty }} × {{ money($tt->pivot->unit_price) }})@endif</td><td class="text-end">{{ money($tt->pivot->line_total) }}</td></tr>
+        @endforeach
         @foreach($treatment->fees as $f)
             <tr><td>{{ $f->name }}@if($f->is_foc) (FOC)@endif</td><td class="text-end">{{ money($f->line_total) }}</td></tr>
         @endforeach

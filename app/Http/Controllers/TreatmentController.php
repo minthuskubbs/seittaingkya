@@ -41,7 +41,7 @@ class TreatmentController extends Controller
     {
         $treatment = DB::transaction(function () use ($request) {
             $treatment = Treatment::create($this->validated($request));
-            $treatment->treatmentTypes()->sync($request->input('treatment_types', []));
+            $this->syncTreatmentTypes($treatment, $request);
             $this->syncFees($treatment, $request->input('fees', []));
             $treatment->recalculateTotal();
 
@@ -70,7 +70,7 @@ class TreatmentController extends Controller
     {
         DB::transaction(function () use ($request, $treatment) {
             $treatment->update($this->validated($request));
-            $treatment->treatmentTypes()->sync($request->input('treatment_types', []));
+            $this->syncTreatmentTypes($treatment, $request);
             if ($request->has('fees')) {
                 $treatment->fees()->delete();
                 $this->syncFees($treatment, $request->input('fees', []));
@@ -105,6 +105,27 @@ class TreatmentController extends Controller
                 'line_total' => $price,
             ]);
         }
+    }
+
+    /** Attach selected treatment types with qty + a price snapshot (line_total). */
+    private function syncTreatmentTypes(Treatment $treatment, Request $request): void
+    {
+        $ids = $request->input('treatment_types', []);
+        $qtys = $request->input('treatment_type_qty', []);
+        $types = \App\Models\TreatmentType::whereIn('id', $ids)->get()->keyBy('id');
+
+        $sync = [];
+        foreach ($ids as $id) {
+            $type = $types->get($id);
+            if (! $type) {
+                continue;
+            }
+            // Types flagged require_qty=false (e.g. Scaling) are a flat charge.
+            $qty = $type->require_qty ? max(1, (int) ($qtys[$id] ?? 1)) : 1;
+            $unit = (float) $type->price;
+            $sync[$id] = ['qty' => $qty, 'unit_price' => $unit, 'line_total' => $unit * $qty];
+        }
+        $treatment->treatmentTypes()->sync($sync);
     }
 
     private function formData(?Treatment $treatment): array

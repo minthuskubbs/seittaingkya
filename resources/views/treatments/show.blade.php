@@ -28,6 +28,9 @@
         <div class="card mb-3"><div class="card-header">Charges</div>
             <div class="table-responsive"><table class="table mb-0">
                 <tbody>
+                @foreach($treatment->treatmentTypes as $tt)
+                    <tr><td>{{ $tt->name }}@if($tt->pivot->qty > 1) ({{ $tt->pivot->qty }} × {{ money($tt->pivot->unit_price) }})@endif</td><td class="text-end">{{ money($tt->pivot->line_total) }}</td></tr>
+                @endforeach
                 @foreach($treatment->fees as $f)
                     <tr><td>{{ $f->name }}@if($f->is_foc) <span class="badge bg-info">FOC</span>@endif</td><td class="text-end">{{ money($f->line_total) }}</td></tr>
                 @endforeach

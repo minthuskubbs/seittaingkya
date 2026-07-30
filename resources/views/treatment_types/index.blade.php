@@ -6,11 +6,13 @@
     <a href="{{ route('treatment-types.create') }}" class="btn btn-brand"><i class="bi bi-plus-lg"></i> New Treatment Type</a>
 </div>
 <div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
-    <thead><tr><th>Name</th><th class="text-center">Order</th><th>Status</th><th></th></tr></thead>
+    <thead><tr><th>Name</th><th class="text-end">Price</th><th class="text-center">Qty?</th><th class="text-center">Order</th><th>Status</th><th></th></tr></thead>
     <tbody>
     @forelse($treatmentTypes as $t)
         <tr>
             <td>{{ $t->name }}</td>
+            <td class="text-end">{{ money($t->price) }}</td>
+            <td class="text-center">{!! $t->require_qty ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>' !!}</td>
             <td class="text-center">{{ $t->sort_order }}</td>
             <td>{!! $t->is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>' !!}</td>
             <td class="text-end">
@@ -20,7 +22,7 @@
                 </form>
             </td>
         </tr>
-    @empty<tr><td colspan="4" class="text-center text-muted py-4">No treatment types.</td></tr>@endforelse
+    @empty<tr><td colspan="6" class="text-center text-muted py-4">No treatment types.</td></tr>@endforelse
     </tbody>
 </table></div></div>
 <div class="mt-3">{{ $treatmentTypes->links() }}</div>

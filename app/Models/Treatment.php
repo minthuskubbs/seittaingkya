@@ -49,7 +49,13 @@ class Treatment extends Model
 
     public function treatmentTypes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(TreatmentType::class);
+        return $this->belongsToMany(TreatmentType::class)
+            ->withPivot(['qty', 'unit_price', 'line_total']);
+    }
+
+    public function treatmentTypesTotal(): float
+    {
+        return (float) $this->treatmentTypes->sum(fn ($tt) => (float) $tt->pivot->line_total);
     }
 
     public function appointment(): BelongsTo
@@ -88,10 +94,11 @@ class Treatment extends Model
         return (float) $this->implant_price * (int) $this->implant_qty;
     }
 
-    /** Fees + per-tooth + surgery + additional + denture (excludes linked medicine sales). */
+    /** Fees + treatment types + per-tooth + surgery + additional + denture (excludes linked medicine sales). */
     public function chargesTotal(): float
     {
         return (float) $this->fees()->sum('line_total')
+            + $this->treatmentTypesTotal()
             + $this->extractionTotal() + $this->implantTotal()
             + (float) $this->surgery_charge + (float) $this->additional_charge + (float) $this->denture_charge;
     }

@@ -71,8 +71,18 @@ class DatabaseSeeder extends Seeder
         }
 
         // Treatment types (Tx-names) — super admin managed, multi-select on treatments.
-        foreach ([['Scaling', 1], ['Filling', 2], ['Extraction', 3], ['Root Canal', 4], ['Crown', 5], ['Denture', 6], ['Implant', 7], ['Whitening', 8]] as [$n, $o]) {
-            \App\Models\TreatmentType::firstOrCreate(['name' => $n], ['sort_order' => $o, 'is_active' => true]);
+        // [name, sort, price, require_qty]. Scaling is a flat charge (no qty).
+        foreach ([
+            ['Scaling', 1, 20000, false],
+            ['Filling', 2, 25000, true],
+            ['Root Canal', 4, 80000, true],
+            ['Crown', 5, 150000, true],
+            ['Whitening', 8, 100000, true],
+        ] as [$n, $o, $price, $rq]) {
+            \App\Models\TreatmentType::firstOrCreate(
+                ['name' => $n],
+                ['sort_order' => $o, 'price' => $price, 'require_qty' => $rq, 'is_active' => true]
+            );
         }
 
         // Sample doctors (records, not login users). one_day_salary + commission %.

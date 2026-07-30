@@ -8,9 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class TreatmentType extends Model
 {
-    protected $fillable = ['name', 'sort_order', 'is_active'];
+    protected $fillable = ['name', 'price', 'require_qty', 'sort_order', 'is_active'];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = [
+        'is_active' => 'boolean',
+        'require_qty' => 'boolean',
+        'price' => 'decimal:2',
+    ];
 
     public function scopeActive(Builder $query): Builder
     {
