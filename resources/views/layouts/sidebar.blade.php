@@ -27,8 +27,6 @@
         @can('clinical.view')
         <a href="{{ route('treatments.index') }}" class="nav-link {{ request()->routeIs('treatments.*') ? 'active' : '' }}">
             <i class="bi bi-clipboard2-pulse"></i> Treatments</a>
-        <a href="{{ route('prescriptions.index') }}" class="nav-link {{ request()->routeIs('prescriptions.*') ? 'active' : '' }}">
-            <i class="bi bi-capsule"></i> Prescriptions</a>
         @endcan
         @can('procedures.manage')
         <a href="{{ route('procedures.index') }}" class="nav-link {{ request()->routeIs('procedures.*') ? 'active' : '' }}">

@@ -47,7 +47,7 @@ class PatientController extends Controller
 
     public function show(Patient $patient)
     {
-        $patient->load(['assignedDoctor', 'appointments.doctor', 'treatments.doctor', 'treatments.treatmentTypes', 'treatments.appointment', 'prescriptions', 'attachments', 'feedbacks.doctor', 'feedbacks.author']);
+        $patient->load(['assignedDoctor', 'appointments.doctor', 'treatments.doctor', 'treatments.treatmentTypes', 'treatments.appointment', 'attachments', 'feedbacks.doctor', 'feedbacks.author']);
         $doctors = \App\Models\Doctor::where('is_active', true)->orderBy('name')->get();
 
         return view('patients.show', compact('patient', 'doctors'));

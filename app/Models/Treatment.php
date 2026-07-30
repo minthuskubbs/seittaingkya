@@ -18,7 +18,7 @@ class Treatment extends Model
         // Billing
         'denture_charge', 'surgery_charge', 'additional_charge',
         'extraction_price', 'extraction_qty', 'implant_price', 'implant_qty',
-        'total_amount',
+        'total_amount', 'discount_type', 'discount_value',
     ];
 
     protected $casts = [
@@ -29,6 +29,7 @@ class Treatment extends Model
         'extraction_price' => 'decimal:2',
         'implant_price' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'discount_value' => 'decimal:2',
     ];
 
     public function patient(): BelongsTo
@@ -95,10 +96,30 @@ class Treatment extends Model
             + (float) $this->surgery_charge + (float) $this->additional_charge + (float) $this->denture_charge;
     }
 
-    /** Grand total including any linked medicine sales. */
-    public function invoiceTotal(): float
+    /** Charges + linked medicine sales, BEFORE discount. */
+    public function grossTotal(): float
     {
         return $this->chargesTotal() + (float) $this->sales()->sum('total');
+    }
+
+    /** Discount amount in MMK (percentage of gross, or a flat amount). */
+    public function discountAmount(): float
+    {
+        $value = (float) $this->discount_value;
+        if ($value <= 0) {
+            return 0.0;
+        }
+        if ($this->discount_type === 'percent') {
+            return round($this->grossTotal() * min($value, 100) / 100, 2);
+        }
+
+        return min($value, $this->grossTotal());
+    }
+
+    /** Grand total the patient pays: gross (charges + medicine) minus discount. */
+    public function invoiceTotal(): float
+    {
+        return max(0, $this->grossTotal() - $this->discountAmount());
     }
 
     public function paidAmount(): float

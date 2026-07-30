@@ -15,7 +15,6 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProcedureController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
@@ -57,7 +56,6 @@ Route::middleware(['auth', 'active', 'clinic.context'])->group(function () {
     Route::resource('treatments', TreatmentController::class);
     Route::post('treatments/{treatment}/payments', [PaymentController::class, 'store'])->name('treatments.payments.store');
     Route::get('treatments/{treatment}/invoice', [PaymentController::class, 'invoice'])->name('treatments.invoice');
-    Route::resource('prescriptions', PrescriptionController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
     Route::resource('procedures', ProcedureController::class)->except('show');
     Route::resource('treatment-types', \App\Http\Controllers\TreatmentTypeController::class)->except('show')->parameters(['treatment-types' => 'treatmentType']);
 

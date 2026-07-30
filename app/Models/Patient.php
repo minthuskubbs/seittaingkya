@@ -44,11 +44,6 @@ class Patient extends Model
         return $this->hasMany(Treatment::class);
     }
 
-    public function prescriptions(): HasMany
-    {
-        return $this->hasMany(Prescription::class);
-    }
-
     public function feedbacks(): HasMany
     {
         return $this->hasMany(DoctorFeedback::class)->latest();

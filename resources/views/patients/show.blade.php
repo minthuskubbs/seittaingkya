@@ -148,19 +148,6 @@
             </div>
         </div>
 
-        <div class="card"><div class="card-header d-flex justify-content-between">
-            <span><i class="bi bi-capsule"></i> Prescriptions</span>
-            @can('clinical.manage')<a href="{{ route('prescriptions.create') }}?patient_id={{ $patient->id }}" class="small">+ Add</a>@endcan
-        </div>
-            <ul class="list-group list-group-flush">
-                @forelse($patient->prescriptions->sortByDesc('prescribed_date') as $pr)
-                    <li class="list-group-item d-flex justify-content-between">
-                        <a href="{{ route('prescriptions.show', $pr) }}">{{ $pr->prescribed_date?->format('Y-m-d') }}</a>
-                        <span class="text-muted small">{{ $pr->doctor->name ?? '' }}</span>
-                    </li>
-                @empty<li class="list-group-item text-muted text-center">None</li>@endforelse
-            </ul>
-        </div>
     </div>
 </div>
 @endsection

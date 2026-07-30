@@ -46,6 +46,9 @@
                     @if($treatment->sales->count())
                         <tr><td class="text-end">Medicine Sales</td><td class="text-end">{{ money($treatment->sales->sum('total')) }}</td></tr>
                     @endif
+                    @if($treatment->discountAmount() > 0)
+                        <tr class="text-danger"><td class="text-end">Discount @if($treatment->discount_type==='percent')({{ rtrim(rtrim(number_format($treatment->discount_value,2),'0'),'.') }}%)@endif</td><td class="text-end">- {{ money($treatment->discountAmount()) }}</td></tr>
+                    @endif
                     <tr class="fw-bold table-light"><td class="text-end">Invoice Total</td><td class="text-end">{{ money($treatment->invoiceTotal()) }}</td></tr>
                 </tfoot>
             </table></div>

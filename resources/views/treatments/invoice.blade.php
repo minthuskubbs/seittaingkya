@@ -45,6 +45,10 @@
         @endforeach
         </tbody>
         <tfoot>
+            @if($treatment->discountAmount() > 0)
+            <tr><td class="text-end">Subtotal</td><td class="text-end">{{ money($treatment->grossTotal()) }}</td></tr>
+            <tr><td class="text-end">Discount @if($treatment->discount_type==='percent')({{ rtrim(rtrim(number_format($treatment->discount_value,2),'0'),'.') }}%)@endif</td><td class="text-end">- {{ money($treatment->discountAmount()) }}</td></tr>
+            @endif
             <tr class="fw-bold"><td class="text-end">Total</td><td class="text-end">{{ money($treatment->invoiceTotal()) }}</td></tr>
             <tr><td class="text-end">Paid</td><td class="text-end">{{ money($treatment->paidAmount()) }}</td></tr>
             <tr class="fw-bold"><td class="text-end">Balance</td><td class="text-end">{{ money($treatment->balance()) }}</td></tr>

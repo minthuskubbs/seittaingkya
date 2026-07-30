@@ -50,25 +50,9 @@
                             @endforeach
                         </select></div>
                 @endunless
-                <div class="mb-2"><label class="form-label">Treatment (optional)</label>
-                    <select name="treatment_id" class="form-select">
-                        <option value="">— Standalone receipt —</option>
-                        @foreach($treatments as $tx)
-                            <option value="{{ $tx->id }}">TX-{{ $tx->id }} · {{ $tx->patient?->patient_code }} {{ $tx->patient?->name }} · {{ $tx->treatment_date?->format('Y-m-d') }}</option>
-                        @endforeach
-                    </select>
-                    <div class="form-text">Selecting a treatment adds this sale's total to that treatment's invoice. Leave empty for a standalone receipt.</div>
-                </div>
-                <div class="mb-2"><label class="form-label">Sale Type</label>
-                    <select name="sale_type" class="form-select" x-model="saleType">
-                        @foreach($saleTypes as $t)<option value="{{ $t->slug }}">{{ $t->name }}</option>@endforeach
-                    </select></div>
-                <div class="mb-2" x-show="saleType==='doctor'"><label class="form-label">Doctor</label>
-                    <select name="doctor_id" class="form-select"><option value="">—</option>
-                        @foreach($doctors as $d)<option value="{{ $d->id }}">{{ $d->name }}</option>@endforeach</select></div>
-                <div class="mb-2"><label class="form-label">Patient (optional)</label>
-                    <select name="patient_id" class="form-select"><option value="">—</option>
-                        @foreach($patients as $p)<option value="{{ $p->id }}">{{ $p->name }}</option>@endforeach</select></div>
+                {{-- This page is walk-in medicine sales only. Treatment/doctor
+                     medicine sales are added from the treatment page. --}}
+                <input type="hidden" name="sale_type" value="walk_in">
                 <div class="mb-2"><label class="form-label">Customer Name (walk-in)</label>
                     <input name="customer_name" class="form-control"></div>
                 <div class="mb-2"><label class="form-label">Discount</label>

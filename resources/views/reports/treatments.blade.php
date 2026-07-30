@@ -24,6 +24,10 @@
     </div>
 </div></form>
 
+<div class="mb-3">
+    <span class="badge bg-brand fs-6">Total: {{ $treatments->total() }} record{{ $treatments->total() == 1 ? '' : 's' }}</span>
+    <span class="text-muted small ms-2">(matching the current filters)</span>
+</div>
 <div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
     <thead><tr><th>Date</th><th>Patient</th><th>Treatment Type</th><th>Doctor</th><th></th></tr></thead>
     <tbody>

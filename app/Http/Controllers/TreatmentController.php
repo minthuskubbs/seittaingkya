@@ -143,6 +143,8 @@ class TreatmentController extends Controller
             'extraction_qty' => 'nullable|integer|min:0',
             'implant_price' => 'nullable|numeric|min:0',
             'implant_qty' => 'nullable|integer|min:0',
+            'discount_type' => 'nullable|in:percent,fixed',
+            'discount_value' => 'nullable|numeric|min:0',
         ]);
     }
 }

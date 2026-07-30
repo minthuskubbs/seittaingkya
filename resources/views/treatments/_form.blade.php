@@ -94,8 +94,20 @@
             <div class="col-4"><label class="form-label mb-1">Additional</label>
                 <input type="number" min="0" step="0.01" name="additional_charge" class="form-control form-control-sm" x-model.number="additional" @input="recalc()" value="{{ old('additional_charge',$treatment->additional_charge??0) }}"></div>
         </div>
+        <div class="row g-2 mt-1">
+            <div class="col-6"><label class="form-label mb-1">Discount Type</label>
+                <select name="discount_type" class="form-select form-select-sm" x-model="discountType" @change="recalc()">
+                    <option value="fixed" @selected(old('discount_type',$treatment->discount_type??'fixed')==='fixed')>Fixed (MMK)</option>
+                    <option value="percent" @selected(old('discount_type',$treatment->discount_type??'')==='percent')>Percent (%)</option>
+                </select></div>
+            <div class="col-6"><label class="form-label mb-1">Discount Value</label>
+                <input type="number" min="0" step="0.01" name="discount_value" class="form-control form-control-sm" x-model.number="discountValue" @input="recalc()" value="{{ old('discount_value',$treatment->discount_value??0) }}"></div>
+        </div>
         <div class="card mt-3"><div class="card-body py-2">
-            <div class="d-flex justify-content-between h5 mb-0">Charges Total <span class="text-brand" x-text="fmt(total)"></span></div>
+            <div class="d-flex justify-content-between mb-1"><span>Charges Total</span><span x-text="fmt(total)"></span></div>
+            <div class="d-flex justify-content-between mb-1 text-danger"><span>Discount</span><span x-text="'- ' + fmt(discountAmount)"></span></div>
+            <div class="d-flex justify-content-between h5 mb-0">Net Total <span class="text-brand" x-text="fmt(net)"></span></div>
+            <div class="form-text">Linked medicine sales are added on top in the treatment invoice.</div>
         </div></div>
     </div>
 </div>
@@ -115,6 +127,9 @@ function txBilling() {
     imPrice: {{ old('implant_price',$treatment->implant_price??0) }}, imQty: {{ old('implant_qty',$treatment->implant_qty??0) }},
     surgery: {{ old('surgery_charge',$treatment->surgery_charge??0) }}, denture: {{ old('denture_charge',$treatment->denture_charge??0) }},
     additional: {{ old('additional_charge',$treatment->additional_charge??0) }}, total: 0,
+    discountType: '{{ old('discount_type',$treatment->discount_type??'fixed') }}',
+    discountValue: {{ old('discount_value',$treatment->discount_value??0) }},
+    discountAmount: 0, net: 0,
     init() { this.recalc(); },
     fmt(n) { return new Intl.NumberFormat().format(Math.round(n||0)) + ' MMK'; },
     recalc() {
@@ -122,6 +137,9 @@ function txBilling() {
       document.querySelectorAll('input[name="fees[]"]:checked').forEach(el => fees += parseFloat(el.dataset.price||0));
       this.total = fees + (this.exPrice*this.exQty) + (this.imPrice*this.imQty)
         + (this.surgery||0) + (this.denture||0) + (this.additional||0);
+      const v = this.discountValue || 0;
+      this.discountAmount = this.discountType === 'percent' ? this.total * Math.min(v,100) / 100 : Math.min(v, this.total);
+      this.net = Math.max(0, this.total - this.discountAmount);
     }
   }
 }
