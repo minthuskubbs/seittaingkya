@@ -74,6 +74,7 @@ class FeeController extends Controller
             'clinic_id' => 'required|exists:clinics,id',
             'name' => 'required|string|max:255',
             'category' => 'required|in:service,xray,scanner,dentist,other',
+            'fee_group' => 'required|in:treatment,service',
             'price' => 'required|numeric|min:0',
             'is_foc' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',

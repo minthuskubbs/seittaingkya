@@ -9,7 +9,12 @@ class Fee extends Model
 {
     use BelongsToClinic;
 
-    protected $fillable = ['clinic_id', 'name', 'category', 'price', 'is_foc', 'is_active'];
+    protected $fillable = ['clinic_id', 'name', 'category', 'fee_group', 'price', 'is_foc', 'is_active'];
+
+    public const GROUPS = [
+        'treatment' => 'Treatment Fees',
+        'service' => 'Services Fees',
+    ];
 
     protected $casts = [
         'price' => 'decimal:2',

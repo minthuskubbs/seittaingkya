@@ -94,6 +94,25 @@ class Treatment extends Model
         return (float) $this->implant_price * (int) $this->implant_qty;
     }
 
+    /**
+     * Commissionable "Treatment Fees" total: treatment types + per-tooth + surgery
+     * + additional + fees flagged as the treatment group. Excludes Services Fees,
+     * denture and medicine (doctor commission is calculated on this).
+     */
+    public function treatmentFeesTotal(): float
+    {
+        return $this->treatmentTypesTotal()
+            + $this->extractionTotal() + $this->implantTotal()
+            + (float) $this->surgery_charge + (float) $this->additional_charge
+            + (float) $this->fees()->where('fee_group', 'treatment')->sum('line_total');
+    }
+
+    /** Services Fees total (scanner, service charge, x-ray) — not commissionable. */
+    public function servicesFeesTotal(): float
+    {
+        return (float) $this->fees()->where('fee_group', 'service')->sum('line_total');
+    }
+
     /** Fees + treatment types + per-tooth + surgery + additional + denture (excludes linked medicine sales). */
     public function chargesTotal(): float
     {

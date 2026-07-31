@@ -28,21 +28,24 @@ class DoctorPayrollService
         $start = $month->copy()->startOfMonth();
         $end = $month->copy()->endOfMonth()->endOfDay();
 
-        // Billing lives on treatments now: total_amount is the full charges (incl.
-        // denture); denture is then deducted once in the commission base.
+        // Commission is calculated ONLY on Treatment Fees (dentist/extraction/
+        // implant/surgery/additional/treatment-types) — Services Fees, denture and
+        // medicine sales are excluded via Treatment::treatmentFeesTotal().
         $treatments = Treatment::withoutGlobalScope('clinic')
+            ->with(['fees', 'treatmentTypes'])
             ->where('doctor_id', $doctor->id)
             ->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))
-            ->whereBetween('treatment_date', [$start, $end]);
+            ->whereBetween('treatment_date', [$start, $end])
+            ->get();
 
-        $totalIncome = (float) (clone $treatments)->sum('total_amount');
-        $dentureTotal = (float) (clone $treatments)->sum('denture_charge');
+        $totalIncome = (float) $treatments->sum(fn ($t) => $t->treatmentFeesTotal());
+        $dentureTotal = (float) $treatments->sum('denture_charge');
 
         $oneDaySalary = (float) $doctor->one_day_salary;
         $commissionPercent = (float) $doctor->commission_percent;
 
         $basicSalary = $oneDaySalary * $daysWorked;
-        $commissionBase = max(0, $totalIncome - (2 * $basicSalary) - $dentureTotal);
+        $commissionBase = max(0, $totalIncome - (2 * $basicSalary));
         $commission = round($commissionBase * $commissionPercent / 100, 2);
         $total = $basicSalary + $commission;
 

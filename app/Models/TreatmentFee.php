@@ -10,7 +10,7 @@ class TreatmentFee extends Model
     protected $table = 'treatment_fee';
 
     protected $fillable = [
-        'treatment_id', 'fee_id', 'name', 'category', 'price', 'is_foc', 'quantity', 'line_total',
+        'treatment_id', 'fee_id', 'name', 'category', 'fee_group', 'price', 'is_foc', 'quantity', 'line_total',
     ];
 
     protected $casts = [

@@ -14,6 +14,15 @@
         <input name="name" class="form-control" value="{{ old('name', $fee->name ?? '') }}" required>
     </div>
     <div class="col-md-3">
+        <label class="form-label">Group</label>
+        <select name="fee_group" class="form-select">
+            @foreach(\App\Models\Fee::GROUPS as $k=>$v)
+                <option value="{{ $k }}" @selected(old('fee_group', $fee->fee_group ?? 'treatment')===$k)>{{ $v }}</option>
+            @endforeach
+        </select>
+        <div class="form-text">Only Treatment Fees earn doctor commission.</div>
+    </div>
+    <div class="col-md-3">
         <label class="form-label">Category</label>
         <select name="category" class="form-select">
             @foreach(\App\Models\Fee::CATEGORIES as $k=>$v)

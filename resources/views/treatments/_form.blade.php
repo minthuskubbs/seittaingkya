@@ -58,21 +58,25 @@
 
 <div class="row g-3">
     <div class="col-lg-7">
-        <label class="form-label">Service Fees (select applicable)</label>
-        <div class="row g-2">
-            @forelse($fees as $fee)
-                <div class="col-md-6">
-                    <label class="border rounded p-2 d-flex align-items-center gap-2 h-100">
-                        <input type="checkbox" class="form-check-input mt-0" name="fees[]" value="{{ $fee->id }}"
-                               data-price="{{ $fee->effectivePrice() }}" @checked(in_array($fee->id, $selectedFees)) @change="recalc()">
-                        <span class="small">{{ $fee->name }}<br>
-                            <span class="text-muted">{{ $fee->is_foc ? 'FOC (0)' : money($fee->effectivePrice()) }}</span></span>
-                    </label>
-                </div>
-            @empty
-                <div class="col-12 text-muted small">No fee items configured for this clinic.</div>
-            @endforelse
-        </div>
+        @php $feeGroups = $fees->groupBy('fee_group'); @endphp
+        @foreach(\App\Models\Fee::GROUPS as $gKey => $gLabel)
+            <label class="form-label d-block mt-2">{{ $gLabel }}</label>
+            <div class="row g-2">
+                @forelse($feeGroups->get($gKey, collect()) as $fee)
+                    <div class="col-md-6">
+                        <label class="border rounded p-2 d-flex align-items-center gap-2 h-100">
+                            <input type="checkbox" class="form-check-input mt-0" name="fees[]" value="{{ $fee->id }}"
+                                   data-price="{{ $fee->effectivePrice() }}" @checked(in_array($fee->id, $selectedFees)) @change="recalc()">
+                            <span class="small">{{ $fee->name }}<br>
+                                <span class="text-muted">{{ $fee->is_foc ? 'FOC (0)' : money($fee->effectivePrice()) }}</span></span>
+                        </label>
+                    </div>
+                @empty
+                    <div class="col-12 text-muted small">No {{ strtolower($gLabel) }} configured.</div>
+                @endforelse
+            </div>
+        @endforeach
+        <div class="form-text mt-1">Only Treatment Fees earn doctor commission; Services Fees do not.</div>
     </div>
 
     <div class="col-lg-5">

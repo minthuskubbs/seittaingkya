@@ -43,19 +43,19 @@ class DatabaseSeeder extends Seeder
         );
         $asst->syncRoles('assistance_admin');
 
-        // Sample fees per clinic (super admin managed). FOC variants show the 0-price pattern.
+        // Sample fees per clinic (super admin managed). [name, category, price, foc, group]
         $fees = [
-            ['Dentist Fee', 'dentist', 10000, false],
-            ['Dentist Fee (FOC)', 'dentist', 0, true],
-            ['Patient Service Charge', 'service', 5000, false],
-            ['X-ray Charge', 'xray', 8000, false],
-            ['Scanner Fee', 'scanner', 15000, false],
+            ['Dentist Fee', 'dentist', 10000, false, 'treatment'],
+            ['Dentist Fee (FOC)', 'dentist', 0, true, 'treatment'],
+            ['Patient Service Charge', 'service', 5000, false, 'service'],
+            ['X-ray Charge', 'xray', 8000, false, 'service'],
+            ['Scanner Fee', 'scanner', 15000, false, 'service'],
         ];
         foreach ([$clinic1, $clinic2] as $clinic) {
-            foreach ($fees as [$name, $cat, $price, $foc]) {
+            foreach ($fees as [$name, $cat, $price, $foc, $group]) {
                 Fee::withoutGlobalScope('clinic')->firstOrCreate(
                     ['clinic_id' => $clinic->id, 'name' => $name],
-                    ['category' => $cat, 'price' => $price, 'is_foc' => $foc, 'is_active' => true]
+                    ['category' => $cat, 'fee_group' => $group, 'price' => $price, 'is_foc' => $foc, 'is_active' => true]
                 );
             }
         }

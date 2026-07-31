@@ -14,12 +14,13 @@
     </div>
 </div>
 <div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
-    <thead><tr><th>Name</th>@if($clinics->isNotEmpty())<th>Clinic</th>@endif<th>Category</th><th class="text-end">Price</th><th>Status</th><th></th></tr></thead>
+    <thead><tr><th>Name</th>@if($clinics->isNotEmpty())<th>Clinic</th>@endif<th>Group</th><th>Category</th><th class="text-end">Price</th><th>Status</th><th></th></tr></thead>
     <tbody>
     @forelse($fees as $fee)
         <tr>
             <td>{{ $fee->name }} @if($fee->is_foc)<span class="badge bg-info">FOC</span>@endif</td>
             @if($clinics->isNotEmpty())<td><span class="badge badge-soft-brand">{{ $fee->clinic->name ?? '—' }}</span></td>@endif
+            <td><span class="badge {{ $fee->fee_group === 'service' ? 'bg-secondary' : 'bg-brand' }}">{{ \App\Models\Fee::GROUPS[$fee->fee_group] ?? $fee->fee_group }}</span></td>
             <td>{{ \App\Models\Fee::CATEGORIES[$fee->category] ?? $fee->category }}</td>
             <td class="text-end">{{ money($fee->effectivePrice()) }}</td>
             <td>{!! $fee->is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>' !!}</td>
@@ -30,7 +31,7 @@
                 </form>
             </td>
         </tr>
-    @empty<tr><td colspan="{{ $clinics->isNotEmpty() ? 6 : 5 }}" class="text-center text-muted py-4">No fees yet.</td></tr>@endforelse
+    @empty<tr><td colspan="{{ $clinics->isNotEmpty() ? 7 : 6 }}" class="text-center text-muted py-4">No fees yet.</td></tr>@endforelse
     </tbody>
 </table></div></div>
 <div class="mt-3">{{ $fees->links() }}</div>

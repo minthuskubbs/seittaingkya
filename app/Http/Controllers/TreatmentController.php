@@ -99,6 +99,7 @@ class TreatmentController extends Controller
                 'fee_id' => $fee->id,
                 'name' => $fee->name,
                 'category' => $fee->category,
+                'fee_group' => $fee->fee_group,
                 'price' => $price,
                 'is_foc' => $fee->is_foc,
                 'quantity' => 1,
