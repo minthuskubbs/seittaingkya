@@ -29,17 +29,18 @@
     <span class="text-muted small ms-2">(matching the current filters)</span>
 </div>
 <div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
-    <thead><tr><th>Date</th><th>Patient</th><th>Treatment Type</th><th>Doctor</th><th></th></tr></thead>
+    <thead><tr><th>Date</th><th>Patient</th><th>Treatment Type</th><th class="text-center">Qty</th><th>Doctor</th><th></th></tr></thead>
     <tbody>
     @forelse($treatments as $t)
         <tr>
             <td>{{ $t->treatment_date?->format('Y-m-d') }}</td>
             <td><a href="{{ route('patients.show', $t->patient_id) }}">{{ $t->patient->patient_code ?? '' }} — {{ $t->patient->name ?? '—' }}</a></td>
-            <td>@forelse($t->treatmentTypes as $tt)<span class="badge badge-soft-brand">{{ $tt->name }}</span> @empty<span class="text-muted">—</span>@endforelse</td>
+            <td>@forelse($t->treatmentTypes as $tt)<div class="mb-1"><span class="badge badge-soft-brand">{{ $tt->name }}</span></div>@empty<span class="text-muted">—</span>@endforelse</td>
+            <td class="text-center">@forelse($t->treatmentTypes as $tt)<div class="mb-1">{{ $tt->pivot->qty }}</div>@empty<span class="text-muted">—</span>@endforelse</td>
             <td>{{ $t->doctor->name ?? '—' }}</td>
             <td class="text-end"><a href="{{ route('treatments.show', $t) }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
         </tr>
-    @empty<tr><td colspan="5" class="text-center text-muted py-4">No treatments match the filters.</td></tr>@endforelse
+    @empty<tr><td colspan="6" class="text-center text-muted py-4">No treatments match the filters.</td></tr>@endforelse
     </tbody>
 </table></div></div>
 <div class="mt-3">{{ $treatments->links() }}</div>

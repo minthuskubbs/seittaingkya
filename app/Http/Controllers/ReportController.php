@@ -55,11 +55,12 @@ class ReportController extends Controller
 
         if ($request->export === 'csv') {
             return $this->streamCsv('treatments-'.date('Ymd-His').'.csv',
-                ['Date', 'Patient Code', 'Patient', 'Treatment Type', 'Doctor'],
+                ['Date', 'Patient Code', 'Patient', 'Treatment Type', 'Qty', 'Doctor'],
                 $query->get()->map(fn ($t) => [
                     $t->treatment_date?->format('Y-m-d'),
                     $t->patient->patient_code ?? '', $t->patient->name ?? '',
                     $t->treatmentTypes->pluck('name')->implode(', '),
+                    $t->treatmentTypes->pluck('pivot.qty')->implode(', '),
                     $t->doctor->name ?? '',
                 ]));
         }
