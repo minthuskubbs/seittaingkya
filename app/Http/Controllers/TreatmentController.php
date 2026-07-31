@@ -142,6 +142,8 @@ class TreatmentController extends Controller
             'extractionTypes' => \App\Models\ToothChargeType::kind('extraction')->active()->get(),
             'implantTypes' => \App\Models\ToothChargeType::kind('implant')->active()->get(),
             'dentureTypes' => \App\Models\DentureType::active()->get(),
+            'medicines' => \App\Models\Product::where('is_active', true)->where('type', 'medicine')
+                ->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))->orderBy('name')->get(),
             'doctors' => Doctor::where('is_active', true)->orderBy('name')->get(),
             'fees' => Fee::where('is_active', true)
                 ->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))
