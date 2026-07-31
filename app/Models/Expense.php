@@ -11,7 +11,7 @@ class Expense extends Model
     use BelongsToClinic;
 
     protected $fillable = [
-        'clinic_id', 'expense_type_id', 'user_id', 'title', 'amount', 'expense_date', 'note', 'created_by',
+        'clinic_id', 'expense_type_id', 'user_id', 'doctor_id', 'supplier_id', 'title', 'amount', 'expense_date', 'note', 'created_by',
     ];
 
     protected $casts = [
@@ -27,5 +27,15 @@ class Expense extends Model
     public function staff(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function doctor(): BelongsTo
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

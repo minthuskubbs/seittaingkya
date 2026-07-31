@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/icons/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <style>[x-cloak]{display:none!important}</style>
     <script defer src="{{ asset('vendor/alpine/alpine.min.js') }}"></script>
 </head>
 <body>

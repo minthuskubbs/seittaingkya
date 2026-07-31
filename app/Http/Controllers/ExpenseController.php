@@ -23,7 +23,7 @@ class ExpenseController extends Controller
         $clinicFilter = $request->input('clinic_id', $isSuper ? session('active_clinic_id') : null);
         $month = $request->month ? Carbon::parse($request->month.'-01') : Carbon::now()->startOfMonth();
 
-        $expenses = Expense::with(['type', 'staff'])
+        $expenses = Expense::with(['type', 'staff', 'doctor', 'supplier'])
             ->when($clinicFilter, fn ($q) => $q->where('clinic_id', $clinicFilter))
             ->whereBetween('expense_date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()->endOfDay()])
             ->latest('expense_date')
@@ -43,6 +43,12 @@ class ExpenseController extends Controller
             'clinics' => $isSuper ? Clinic::orderBy('name')->get() : collect(),
             'types' => ExpenseType::active()->get(),
             'staff' => User::when($clinicFilter, fn ($q) => $q->where('clinic_id', $clinicFilter))->orderBy('name')->get(),
+            'doctors' => \App\Models\Doctor::withoutGlobalScope('clinic')
+                ->when($clinicFilter, fn ($q) => $q->where('clinic_id', $clinicFilter))
+                ->where('is_active', true)->orderBy('name')->get(),
+            'suppliers' => \App\Models\Supplier::withoutGlobalScope('clinic')
+                ->when($clinicFilter, fn ($q) => $q->where('clinic_id', $clinicFilter))
+                ->where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -52,6 +58,8 @@ class ExpenseController extends Controller
             'clinic_id' => 'required|exists:clinics,id',
             'expense_type_id' => 'nullable|exists:expense_types,id',
             'user_id' => 'nullable|exists:users,id',
+            'doctor_id' => 'nullable|exists:doctors,id',
+            'supplier_id' => 'nullable|exists:suppliers,id',
             'title' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'expense_date' => 'required|date',
