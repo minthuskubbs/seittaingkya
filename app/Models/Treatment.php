@@ -16,7 +16,7 @@ class Treatment extends Model
         'clinic_id', 'patient_id', 'appointment_id', 'doctor_id', 'procedure_id',
         'tooth', 'diagnosis', 'notes', 'treatment_date', 'doctor_feedback',
         // Billing
-        'denture_charge', 'surgery_charge', 'additional_charge',
+        'denture_charge', 'denture_type_id', 'surgery_charge', 'additional_charge',
         'extraction_price', 'extraction_qty', 'extraction_type_id',
         'implant_price', 'implant_qty', 'implant_type_id',
         'total_amount', 'discount_type', 'discount_value',
@@ -56,6 +56,11 @@ class Treatment extends Model
     public function implantType(): BelongsTo
     {
         return $this->belongsTo(ToothChargeType::class, 'implant_type_id');
+    }
+
+    public function dentureType(): BelongsTo
+    {
+        return $this->belongsTo(DentureType::class, 'denture_type_id');
     }
 
     public function treatmentTypes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

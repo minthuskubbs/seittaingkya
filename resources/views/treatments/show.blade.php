@@ -41,7 +41,7 @@
                     <tr><td>Tooth Implant @if($treatment->implantType) — {{ $treatment->implantType->name }}@endif ({{ $treatment->implant_qty }} × {{ money($treatment->implant_price) }})</td><td class="text-end">{{ money($treatment->implantTotal()) }}</td></tr>
                 @endif
                 @if($treatment->surgery_charge > 0)<tr><td>Surgery</td><td class="text-end">{{ money($treatment->surgery_charge) }}</td></tr>@endif
-                @if($treatment->denture_charge > 0)<tr><td>Denture / Prosthesis</td><td class="text-end">{{ money($treatment->denture_charge) }}</td></tr>@endif
+                @if($treatment->denture_charge > 0)<tr><td>Denture@if($treatment->dentureType) — {{ $treatment->dentureType->name }}@endif</td><td class="text-end">{{ money($treatment->denture_charge) }}</td></tr>@endif
                 @if($treatment->additional_charge > 0)<tr><td>Additional</td><td class="text-end">{{ money($treatment->additional_charge) }}</td></tr>@endif
                 </tbody>
                 <tfoot>

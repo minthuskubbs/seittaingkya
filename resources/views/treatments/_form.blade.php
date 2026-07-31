@@ -110,7 +110,12 @@
             <div class="col-4"><label class="form-label mb-1">Surgery</label>
                 <input type="number" min="0" step="0.01" name="surgery_charge" class="form-control form-control-sm" x-model.number="surgery" @input="recalc()" value="{{ old('surgery_charge',$treatment->surgery_charge??0) }}"></div>
             <div class="col-4"><label class="form-label mb-1">Denture</label>
-                <input type="number" min="0" step="0.01" name="denture_charge" class="form-control form-control-sm" x-model.number="denture" @input="recalc()" value="{{ old('denture_charge',$treatment->denture_charge??0) }}"></div>
+                <select name="denture_type_id" class="form-select form-select-sm" @change="denture = +($event.target.selectedOptions[0].dataset.price||0); recalc()">
+                    <option value="" data-price="0">— None —</option>
+                    @foreach($dentureTypes as $dt)
+                        <option value="{{ $dt->id }}" data-price="{{ $dt->price }}" @selected(old('denture_type_id',$treatment->denture_type_id??'')==$dt->id)>{{ $dt->name }} ({{ money($dt->price) }})</option>
+                    @endforeach
+                </select></div>
             <div class="col-4"><label class="form-label mb-1">Additional</label>
                 <input type="number" min="0" step="0.01" name="additional_charge" class="form-control form-control-sm" x-model.number="additional" @input="recalc()" value="{{ old('additional_charge',$treatment->additional_charge??0) }}"></div>
         </div>

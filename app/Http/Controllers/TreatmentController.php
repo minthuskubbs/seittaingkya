@@ -141,6 +141,7 @@ class TreatmentController extends Controller
             'treatmentTypes' => \App\Models\TreatmentType::active()->get(),
             'extractionTypes' => \App\Models\ToothChargeType::kind('extraction')->active()->get(),
             'implantTypes' => \App\Models\ToothChargeType::kind('implant')->active()->get(),
+            'dentureTypes' => \App\Models\DentureType::active()->get(),
             'doctors' => Doctor::where('is_active', true)->orderBy('name')->get(),
             'fees' => Fee::where('is_active', true)
                 ->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))
@@ -160,7 +161,7 @@ class TreatmentController extends Controller
             'notes' => 'nullable|string',
             'treatment_date' => 'required|date',
             // Billing
-            'denture_charge' => 'nullable|numeric|min:0',
+            'denture_type_id' => 'nullable|exists:denture_types,id',
             'surgery_charge' => 'nullable|numeric|min:0',
             'additional_charge' => 'nullable|numeric|min:0',
             'extraction_type_id' => 'nullable|exists:tooth_charge_types,id',
@@ -176,6 +177,8 @@ class TreatmentController extends Controller
             ? (float) \App\Models\ToothChargeType::find($data['extraction_type_id'])?->price : 0;
         $data['implant_price'] = ! empty($data['implant_type_id'])
             ? (float) \App\Models\ToothChargeType::find($data['implant_type_id'])?->price : 0;
+        $data['denture_charge'] = ! empty($data['denture_type_id'])
+            ? (float) \App\Models\DentureType::find($data['denture_type_id'])?->price : 0;
 
         return $data;
     }

@@ -81,6 +81,11 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        // Denture types (super admin managed) with prices.
+        foreach ([['Acrylic Denture', 150000], ['Flexible Denture', 250000], ['Metal Frame Denture', 400000]] as [$n, $p]) {
+            \App\Models\DentureType::firstOrCreate(['name' => $n], ['price' => $p, 'is_active' => true]);
+        }
+
         // Treatment types (Tx-names) — super admin managed, multi-select on treatments.
         // [name, sort, price, require_qty]. Scaling is a flat charge (no qty).
         foreach ([

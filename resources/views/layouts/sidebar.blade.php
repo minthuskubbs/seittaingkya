@@ -91,6 +91,8 @@
             <i class="bi bi-clipboard-check"></i> Treatment Types</a>
         <a href="{{ route('tooth-charge-types.index', ['kind'=>'extraction']) }}" class="nav-link {{ request()->routeIs('tooth-charge-types.*') ? 'active' : '' }}">
             <i class="bi bi-tooth"></i> Tooth Charge Types</a>
+        <a href="{{ route('denture-types.index') }}" class="nav-link {{ request()->routeIs('denture-types.*') ? 'active' : '' }}">
+            <i class="bi bi-badge-tm"></i> Denture Types</a>
         @endrole
         @can('staff.manage')
         <a href="{{ route('staff.index') }}" class="nav-link {{ request()->routeIs('staff.*') ? 'active' : '' }}">

@@ -59,6 +59,7 @@ Route::middleware(['auth', 'active', 'clinic.context'])->group(function () {
     Route::resource('procedures', ProcedureController::class)->except('show');
     Route::resource('treatment-types', \App\Http\Controllers\TreatmentTypeController::class)->except('show')->parameters(['treatment-types' => 'treatmentType']);
     Route::resource('tooth-charge-types', \App\Http\Controllers\ToothChargeTypeController::class)->except('show')->parameters(['tooth-charge-types' => 'toothChargeType']);
+    Route::resource('denture-types', \App\Http\Controllers\DentureTypeController::class)->except('show')->parameters(['denture-types' => 'dentureType']);
 
     // Attachments (x-ray / documents)
     Route::post('attachments', [AttachmentController::class, 'store'])->name('attachments.store');
