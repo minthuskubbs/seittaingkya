@@ -58,6 +58,7 @@ Route::middleware(['auth', 'active', 'clinic.context'])->group(function () {
     Route::get('treatments/{treatment}/invoice', [PaymentController::class, 'invoice'])->name('treatments.invoice');
     Route::resource('procedures', ProcedureController::class)->except('show');
     Route::resource('treatment-types', \App\Http\Controllers\TreatmentTypeController::class)->except('show')->parameters(['treatment-types' => 'treatmentType']);
+    Route::resource('tooth-charge-types', \App\Http\Controllers\ToothChargeTypeController::class)->except('show')->parameters(['tooth-charge-types' => 'toothChargeType']);
 
     // Attachments (x-ray / documents)
     Route::post('attachments', [AttachmentController::class, 'store'])->name('attachments.store');

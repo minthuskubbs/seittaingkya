@@ -139,6 +139,8 @@ class TreatmentController extends Controller
             'patients' => Patient::orderBy('name')->get(),
             'procedures' => Procedure::where('is_active', true)->orderBy('name')->get(),
             'treatmentTypes' => \App\Models\TreatmentType::active()->get(),
+            'extractionTypes' => \App\Models\ToothChargeType::kind('extraction')->active()->get(),
+            'implantTypes' => \App\Models\ToothChargeType::kind('implant')->active()->get(),
             'doctors' => Doctor::where('is_active', true)->orderBy('name')->get(),
             'fees' => Fee::where('is_active', true)
                 ->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))
@@ -148,7 +150,7 @@ class TreatmentController extends Controller
 
     private function validated(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'patient_id' => 'required|exists:patients,id',
             'appointment_id' => 'nullable|exists:appointments,id',
             'doctor_id' => 'nullable|exists:doctors,id',
@@ -161,12 +163,20 @@ class TreatmentController extends Controller
             'denture_charge' => 'nullable|numeric|min:0',
             'surgery_charge' => 'nullable|numeric|min:0',
             'additional_charge' => 'nullable|numeric|min:0',
-            'extraction_price' => 'nullable|numeric|min:0',
+            'extraction_type_id' => 'nullable|exists:tooth_charge_types,id',
             'extraction_qty' => 'nullable|integer|min:0',
-            'implant_price' => 'nullable|numeric|min:0',
+            'implant_type_id' => 'nullable|exists:tooth_charge_types,id',
             'implant_qty' => 'nullable|integer|min:0',
             'discount_type' => 'nullable|in:percent,fixed',
             'discount_value' => 'nullable|numeric|min:0',
         ]);
+
+        // Snapshot the selected tooth-charge-type prices (dropdown x qty).
+        $data['extraction_price'] = ! empty($data['extraction_type_id'])
+            ? (float) \App\Models\ToothChargeType::find($data['extraction_type_id'])?->price : 0;
+        $data['implant_price'] = ! empty($data['implant_type_id'])
+            ? (float) \App\Models\ToothChargeType::find($data['implant_type_id'])?->price : 0;
+
+        return $data;
     }
 }

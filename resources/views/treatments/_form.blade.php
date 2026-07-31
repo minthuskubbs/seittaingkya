@@ -81,19 +81,27 @@
 
     <div class="col-lg-5">
         <div class="row g-2">
-            <div class="col-12"><label class="form-label mb-1">Tooth Extraction (price × qty)</label>
+            <div class="col-12"><label class="form-label mb-1">Tooth Extraction (type × qty)</label>
                 <div class="input-group input-group-sm">
-                    <span class="input-group-text">Price</span>
-                    <input type="number" min="0" step="0.01" name="extraction_price" class="form-control" x-model.number="exPrice" @input="recalc()" value="{{ old('extraction_price',$treatment->extraction_price??0) }}">
+                    <select name="extraction_type_id" class="form-select" @change="exPrice = +($event.target.selectedOptions[0].dataset.price||0); recalc()">
+                        <option value="" data-price="0">— None —</option>
+                        @foreach($extractionTypes as $et)
+                            <option value="{{ $et->id }}" data-price="{{ $et->price }}" @selected(old('extraction_type_id',$treatment->extraction_type_id??'')==$et->id)>{{ $et->name }} ({{ money($et->price) }})</option>
+                        @endforeach
+                    </select>
                     <span class="input-group-text">Qty</span>
                     <input type="number" min="0" name="extraction_qty" class="form-control" x-model.number="exQty" @input="recalc()" value="{{ old('extraction_qty',$treatment->extraction_qty??0) }}">
                     <span class="input-group-text" x-text="fmt(exPrice*exQty)"></span>
                 </div>
             </div>
-            <div class="col-12"><label class="form-label mb-1">Tooth Implant (price × qty)</label>
+            <div class="col-12"><label class="form-label mb-1">Tooth Implant (type × qty)</label>
                 <div class="input-group input-group-sm">
-                    <span class="input-group-text">Price</span>
-                    <input type="number" min="0" step="0.01" name="implant_price" class="form-control" x-model.number="imPrice" @input="recalc()" value="{{ old('implant_price',$treatment->implant_price??0) }}">
+                    <select name="implant_type_id" class="form-select" @change="imPrice = +($event.target.selectedOptions[0].dataset.price||0); recalc()">
+                        <option value="" data-price="0">— None —</option>
+                        @foreach($implantTypes as $it)
+                            <option value="{{ $it->id }}" data-price="{{ $it->price }}" @selected(old('implant_type_id',$treatment->implant_type_id??'')==$it->id)>{{ $it->name }} ({{ money($it->price) }})</option>
+                        @endforeach
+                    </select>
                     <span class="input-group-text">Qty</span>
                     <input type="number" min="0" name="implant_qty" class="form-control" x-model.number="imQty" @input="recalc()" value="{{ old('implant_qty',$treatment->implant_qty??0) }}">
                     <span class="input-group-text" x-text="fmt(imPrice*imQty)"></span>

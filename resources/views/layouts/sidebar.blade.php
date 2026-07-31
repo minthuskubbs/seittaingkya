@@ -89,6 +89,8 @@
             <i class="bi bi-tags-fill"></i> Expense Types</a>
         <a href="{{ route('treatment-types.index') }}" class="nav-link {{ request()->routeIs('treatment-types.*') ? 'active' : '' }}">
             <i class="bi bi-clipboard-check"></i> Treatment Types</a>
+        <a href="{{ route('tooth-charge-types.index', ['kind'=>'extraction']) }}" class="nav-link {{ request()->routeIs('tooth-charge-types.*') ? 'active' : '' }}">
+            <i class="bi bi-tooth"></i> Tooth Charge Types</a>
         @endrole
         @can('staff.manage')
         <a href="{{ route('staff.index') }}" class="nav-link {{ request()->routeIs('staff.*') ? 'active' : '' }}">

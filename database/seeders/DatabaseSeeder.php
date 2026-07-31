@@ -70,6 +70,17 @@ class DatabaseSeeder extends Seeder
             \App\Models\ExpenseType::firstOrCreate(['name' => $n], ['sort_order' => $o, 'is_active' => true]);
         }
 
+        // Tooth charge types (extraction / implant classes) — super admin managed.
+        foreach ([
+            ['extraction', 'Simple', 10000, 1], ['extraction', 'Surgical', 30000, 2], ['extraction', 'Wisdom Tooth', 50000, 3],
+            ['implant', 'Class A', 500000, 1], ['implant', 'Class B', 700000, 2], ['implant', 'Class C', 900000, 3],
+        ] as [$kind, $name, $price, $o]) {
+            \App\Models\ToothChargeType::firstOrCreate(
+                ['kind' => $kind, 'name' => $name],
+                ['price' => $price, 'sort_order' => $o, 'is_active' => true]
+            );
+        }
+
         // Treatment types (Tx-names) — super admin managed, multi-select on treatments.
         // [name, sort, price, require_qty]. Scaling is a flat charge (no qty).
         foreach ([
