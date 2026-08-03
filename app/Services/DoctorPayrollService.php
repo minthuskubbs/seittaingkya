@@ -10,15 +10,22 @@ use Illuminate\Support\Carbon;
 /**
  * Monthly doctor payroll.
  *
- * Formula (per the client's example):
+ * Formula (per the client's worked example):
  *   basic_salary    = one_day_salary * days_worked
- *   commission_base = total_appointment_income - (2 * basic_salary) - denture_total
+ *   total_income    = treatment_fees_total + lab_fees (denture)
+ *   commission_base = total_income - (2 * basic_salary) - lab_fees
  *   commission      = commission_base * commission_percent / 100
  *   doctor_total    = basic_salary + commission
  *
- * total_appointment_income and denture_total are summed automatically from the
- * doctor's non-cancelled appointments in the month; days_worked is entered by
- * the admin.
+ * total_income is Treatment Fees plus lab (denture) work; Services Fees and
+ * medicine sales are excluded. lab_fees is the denture total on the doctor's
+ * treatments for the month and is deducted so commission is not paid on lab
+ * work. days_worked is entered by the admin.
+ *
+ * Example — Dr Kyaw, 12 days, one-day salary 100,000, 45%:
+ *   basic = 1,200,000; total_income = 11,000,000 (incl. 1,200,000 lab);
+ *   base  = 11,000,000 - 2,400,000 - 1,200,000 = 7,400,000;
+ *   commission = 3,330,000; total = 4,530,000.
  */
 class DoctorPayrollService
 {
@@ -28,9 +35,10 @@ class DoctorPayrollService
         $start = $month->copy()->startOfMonth();
         $end = $month->copy()->endOfMonth()->endOfDay();
 
-        // Commission is calculated ONLY on Treatment Fees (dentist/extraction/
-        // implant/surgery/additional/treatment-types) — Services Fees, denture and
-        // medicine sales are excluded via Treatment::treatmentFeesTotal().
+        // Total income = Treatment Fees (dentist/extraction/implant/surgery/
+        // additional/treatment-types) + lab (denture) work. Services Fees and
+        // medicine sales are excluded. Lab fees (denture) are then deducted from
+        // the commission base so commission is not paid on lab work.
         $treatments = Treatment::withoutGlobalScope('clinic')
             ->with(['fees', 'treatmentTypes'])
             ->where('doctor_id', $doctor->id)
@@ -38,14 +46,15 @@ class DoctorPayrollService
             ->whereBetween('treatment_date', [$start, $end])
             ->get();
 
-        $totalIncome = (float) $treatments->sum(fn ($t) => $t->treatmentFeesTotal());
-        $dentureTotal = (float) $treatments->sum('denture_charge');
+        $treatmentFeesTotal = (float) $treatments->sum(fn ($t) => $t->treatmentFeesTotal());
+        $labFees = (float) $treatments->sum('denture_charge');
+        $totalIncome = $treatmentFeesTotal + $labFees;
 
         $oneDaySalary = (float) $doctor->one_day_salary;
         $commissionPercent = (float) $doctor->commission_percent;
 
         $basicSalary = $oneDaySalary * $daysWorked;
-        $commissionBase = max(0, $totalIncome - (2 * $basicSalary));
+        $commissionBase = max(0, $totalIncome - (2 * $basicSalary) - $labFees);
         $commission = round($commissionBase * $commissionPercent / 100, 2);
         $total = $basicSalary + $commission;
 
@@ -53,8 +62,10 @@ class DoctorPayrollService
             'days_worked' => $daysWorked,
             'one_day_salary' => $oneDaySalary,
             'commission_percent' => $commissionPercent,
+            'treatment_fees_total' => $treatmentFeesTotal,
+            'lab_fees' => $labFees,
             'total_income' => $totalIncome,
-            'denture_total' => $dentureTotal,
+            'denture_total' => $labFees,
             'basic_salary' => $basicSalary,
             'commission_base' => $commissionBase,
             'commission' => $commission,

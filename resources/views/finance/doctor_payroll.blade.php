@@ -25,8 +25,8 @@
     <div class="table-responsive"><table class="table align-middle mb-0" style="min-width:900px">
         <thead><tr>
             <th>Doctor</th>
-            <th class="text-end">Appointment Income</th>
-            <th class="text-end">Denture Total</th>
+            <th class="text-end">Total Income <span class="text-muted fw-normal">(Treatment + Lab)</span></th>
+            <th class="text-end">Lab Fees <span class="text-muted fw-normal">(Denture)</span></th>
             <th class="text-center" style="width:90px">1-Day Salary</th>
             <th class="text-center" style="width:90px">Days</th>
             <th class="text-end">Basic Salary</th>
@@ -68,7 +68,8 @@
     @if(count($rows))
     <div class="alert alert-light small mt-3">
         <strong>How it's calculated:</strong>
-        Basic Salary = 1-Day Salary × Days · Commission = (Appointment Income − 2 × Basic Salary − Denture Total) × Commission % ·
+        Total Income = Treatment Fees + Lab (Denture) · Basic Salary = 1-Day Salary × Days ·
+        Commission = (Total Income − 2 × Basic Salary − Lab Fees) × Commission % ·
         Doctor Total = Basic Salary + Commission.
     </div>
     @endif
