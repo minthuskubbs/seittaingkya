@@ -81,7 +81,10 @@
         <div class="card mb-3"><div class="card-header"><i class="bi bi-cash-coin"></i> Record Payment</div><div class="card-body">
             <form method="POST" action="{{ route('treatments.payments.store', $treatment) }}">
                 @csrf
-                <div class="mb-2"><input type="number" step="0.01" name="amount" class="form-control" placeholder="Amount" value="{{ $balance > 0 ? $balance : '' }}" required></div>
+                <div class="mb-2">
+                    <input type="number" step="0.01" min="0.01" max="{{ $balance > 0 ? $balance : '' }}" name="amount" class="form-control @error('amount') is-invalid @enderror" placeholder="Amount" value="{{ old('amount', $balance > 0 ? $balance : '') }}" required>
+                    @error('amount')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
                 <div class="mb-2"><select name="method" class="form-select">
                     @foreach(\App\Models\Payment::METHODS as $k=>$v)<option value="{{ $k }}">{{ $v }}</option>@endforeach
                 </select></div>
@@ -94,9 +97,17 @@
         <div class="card"><div class="card-header">Payment History</div>
             <ul class="list-group list-group-flush">
                 @forelse($treatment->payments as $pay)
-                    <li class="list-group-item d-flex justify-content-between">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>{{ $pay->paid_at?->format('Y-m-d') }} · {{ \App\Models\Payment::METHODS[$pay->method] ?? $pay->method }}</span>
-                        <strong>{{ money($pay->amount) }}</strong></li>
+                        <span class="d-flex align-items-center gap-2">
+                            <strong>{{ money($pay->amount) }}</strong>
+                            @can('billing.manage')
+                            <form method="POST" action="{{ route('treatments.payments.destroy', [$treatment, $pay]) }}" onsubmit="return confirm('Void this payment of {{ money($pay->amount) }}?')" class="m-0">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-sm text-danger p-0" title="Void payment"><i class="bi bi-x-circle"></i></button>
+                            </form>
+                            @endcan
+                        </span></li>
                 @empty<li class="list-group-item text-muted text-center">No payments.</li>@endforelse
             </ul>
         </div>

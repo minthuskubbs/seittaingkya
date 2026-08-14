@@ -55,6 +55,7 @@ Route::middleware(['auth', 'active', 'clinic.context'])->group(function () {
     // Treatment is the billing record: charges, payments and the printable invoice.
     Route::resource('treatments', TreatmentController::class);
     Route::post('treatments/{treatment}/payments', [PaymentController::class, 'store'])->name('treatments.payments.store');
+    Route::delete('treatments/{treatment}/payments/{payment}', [PaymentController::class, 'destroy'])->name('treatments.payments.destroy');
     Route::get('treatments/{treatment}/invoice', [PaymentController::class, 'invoice'])->name('treatments.invoice');
     Route::resource('procedures', ProcedureController::class)->except('show');
     Route::resource('treatment-types', \App\Http\Controllers\TreatmentTypeController::class)->except('show')->parameters(['treatment-types' => 'treatmentType']);
