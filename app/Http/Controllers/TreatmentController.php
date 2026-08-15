@@ -113,7 +113,7 @@ class TreatmentController extends Controller
     {
         $ids = $request->input('treatment_types', []);
         $qtys = $request->input('treatment_type_qty', []);
-        $types = \App\Models\TreatmentType::whereIn('id', $ids)->get()->keyBy('id');
+        $types = \App\Models\TreatmentType::withoutGlobalScope('clinic')->whereIn('id', $ids)->get()->keyBy('id');
 
         $sync = [];
         foreach ($ids as $id) {
@@ -138,7 +138,8 @@ class TreatmentController extends Controller
         return [
             'patients' => Patient::orderBy('name')->get(),
             'procedures' => Procedure::where('is_active', true)->orderBy('name')->get(),
-            'treatmentTypes' => \App\Models\TreatmentType::active()->get(),
+            'treatmentTypes' => \App\Models\TreatmentType::withoutGlobalScope('clinic')
+                ->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))->active()->get(),
             'extractionTypes' => \App\Models\ToothChargeType::kind('extraction')->active()->get(),
             'implantTypes' => \App\Models\ToothChargeType::kind('implant')->active()->get(),
             'dentureTypes' => \App\Models\DentureType::active()->get(),

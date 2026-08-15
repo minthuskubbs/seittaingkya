@@ -12,11 +12,21 @@ class TreatmentTypeController extends Controller
         $this->middleware('role:super_admin');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $treatmentTypes = TreatmentType::orderBy('sort_order')->orderBy('name')->paginate(20);
+        // Types are per-clinic (each clinic sets its own prices). Default to the
+        // super admin's working clinic; a dropdown switches between clinics.
+        $clinicFilter = $request->input('clinic_id', session('active_clinic_id'));
 
-        return view('treatment_types.index', compact('treatmentTypes'));
+        $treatmentTypes = TreatmentType::with('clinic')
+            ->when($clinicFilter, fn ($q) => $q->where('clinic_id', $clinicFilter))
+            ->orderBy('clinic_id')->orderBy('sort_order')->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
+
+        $clinics = \App\Models\Clinic::orderBy('name')->get();
+
+        return view('treatment_types.index', compact('treatmentTypes', 'clinics', 'clinicFilter'));
     }
 
     public function create()
@@ -53,6 +63,8 @@ class TreatmentTypeController extends Controller
     private function validated(Request $request): array
     {
         $data = $request->validate([
+            // Types belong to a clinic; the super admin picks which one.
+            'clinic_id' => 'required|exists:clinics,id',
             'name' => 'required|string|max:255',
             'price' => 'nullable|numeric|min:0',
             'require_qty' => 'nullable|boolean',

@@ -86,19 +86,22 @@ class DatabaseSeeder extends Seeder
             \App\Models\DentureType::firstOrCreate(['name' => $n], ['price' => $p, 'is_active' => true]);
         }
 
-        // Treatment types (Tx-names) — super admin managed, multi-select on treatments.
+        // Treatment types (Tx-names) — super admin managed, per clinic (each
+        // clinic sets its own prices), multi-select on treatments.
         // [name, sort, price, require_qty]. Scaling is a flat charge (no qty).
-        foreach ([
-            ['Scaling', 1, 20000, false],
-            ['Filling', 2, 25000, true],
-            ['Root Canal', 4, 80000, true],
-            ['Crown', 5, 150000, true],
-            ['Whitening', 8, 100000, true],
-        ] as [$n, $o, $price, $rq]) {
-            \App\Models\TreatmentType::firstOrCreate(
-                ['name' => $n],
-                ['sort_order' => $o, 'price' => $price, 'require_qty' => $rq, 'is_active' => true]
-            );
+        foreach ([$clinic1, $clinic2] as $clinic) {
+            foreach ([
+                ['Scaling', 1, 20000, false],
+                ['Filling', 2, 25000, true],
+                ['Root Canal', 4, 80000, true],
+                ['Crown', 5, 150000, true],
+                ['Whitening', 8, 100000, true],
+            ] as [$n, $o, $price, $rq]) {
+                \App\Models\TreatmentType::withoutGlobalScope('clinic')->firstOrCreate(
+                    ['clinic_id' => $clinic->id, 'name' => $n],
+                    ['sort_order' => $o, 'price' => $price, 'require_qty' => $rq, 'is_active' => true]
+                );
+            }
         }
 
         // Sample doctors (records, not login users). one_day_salary + commission %.

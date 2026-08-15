@@ -1,5 +1,12 @@
 @csrf
 <div class="row g-3">
+    <div class="col-md-4"><label class="form-label">Clinic <span class="text-danger">*</span></label>
+        <select name="clinic_id" class="form-select" required>
+            <option value="">— Select clinic —</option>
+            @foreach(\App\Models\Clinic::where('is_active', true)->orderBy('name')->get() as $c)
+                <option value="{{ $c->id }}" @selected(old('clinic_id', $treatmentType->clinic_id ?? session('active_clinic_id')) == $c->id)>{{ $c->name }}</option>
+            @endforeach
+        </select></div>
     <div class="col-md-5"><label class="form-label">Name <span class="text-danger">*</span></label>
         <input name="name" class="form-control" value="{{ old('name', $treatmentType->name ?? '') }}" required></div>
     <div class="col-md-3"><label class="form-label">Price (MMK)</label>
