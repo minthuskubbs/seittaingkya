@@ -40,11 +40,6 @@
                 </div>
                 <button type="submit" class="btn btn-brand btn-lg w-100">Sign In</button>
             </form>
-
-            <div class="mt-4 small text-muted">
-                <div class="fw-semibold mb-1">Demo accounts (password: <code>password</code>)</div>
-                superadmin@dental.local · admin1@dental.local · assist1@dental.local
-            </div>
         </div>
     </div>
 </div>
