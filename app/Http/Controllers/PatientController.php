@@ -77,6 +77,9 @@ class PatientController extends Controller
     private function validateData(Request $request): array
     {
         return $request->validate([
+            // Patients belong to a clinic; the super admin picks which one (a
+            // clinic-bound user inherits their own clinic automatically).
+            'clinic_id' => 'nullable|exists:clinics,id',
             'name' => 'required|string|max:255',
             'age' => 'nullable|integer|min:0|max:200',
             'address' => 'nullable|string',

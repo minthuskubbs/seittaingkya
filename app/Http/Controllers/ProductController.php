@@ -87,6 +87,9 @@ class ProductController extends Controller
     private function validated(Request $request): array
     {
         $data = $request->validate([
+            // Products belong to a clinic; the super admin picks which one (a
+            // clinic-bound user inherits their own clinic automatically).
+            'clinic_id' => 'nullable|exists:clinics,id',
             'name' => 'required|string|max:255',
             'sku' => 'nullable|string|max:100',
             'type' => 'required|in:medicine,dental_supply',
